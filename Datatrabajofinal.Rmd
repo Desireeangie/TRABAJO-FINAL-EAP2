@@ -1,0 +1,119 @@
+---
+title: "DATA"
+author: "Angie Huamanchumo - 20205980"
+date: "2023-11-13"
+output: html_document
+---
+
+```{r}
+setwd("C:/Users/51914/Downloads")
+```
+
+
+```{r}
+library(ggplot2)
+library(cluster)
+library(dplyr)
+```
+
+```{r}
+rm(list = ls())
+
+library(rio)
+
+dat1=import("Table 5.xlsx")
+head(dat1)
+```
+##### Eliminamos columnas que no nos sirvan
+
+```{r}
+dat1=dat1[,-c(1,4,6,8,10,12,14,16,18)]
+names(dat1)
+```
+##### Ahora nos quedamos con las columnas que utilizaremos
+
+```{r}
+dat1=dat1[,-c(3,4,5,8,10)]
+names(dat1)
+```
+##### Ahora renombramos
+
+```{r}
+dat1=dat1%>%
+  dplyr::rename("IDG"='Gender Inequality Index (Value)')%>%
+   mutate(IDG=na_if(IDG, '..'))%>%
+  dplyr::rename("participacion_politica"='Share of seats in parliament (% held by women)')%>%
+   mutate(participacion_politica=na_if(participacion_politica, '..'))%>%
+  dplyr::rename("secundariaC"='Population with at least some secondary education (Female)')%>%
+  mutate(secundariaC=na_if(secundariaC, '..'))%>%
+ dplyr::rename("participacion_laboral"='Labour force participation rate (Female)')%>%
+ mutate(participacion_laboral=na_if(participacion_laboral, '..'))
+```
+
+
+
+```{r}
+dat2=import("data_ahora si.xlsx")
+head(dat2)
+```
+```{r}
+names(dat2)
+```
+```{r}
+dat2=dat2[,-c(3,4,5,6,8,9,10,12,14)]
+names(dat2)
+```
+```{r}
+dat2=dat2%>%
+  dplyr::rename("violenciaMuj"='Violence against women')%>%
+   mutate(violenciaMuj=na_if(violenciaMuj, '..'))%>%
+  dplyr::rename("inclusionFinan"='Secure access to formal financial services')%>%
+  mutate(inclusionFinan=na_if(inclusionFinan, '..'))%>%
+  dplyr::rename("libertadCir"='...13')%>%
+ mutate(libertadCir=na_if(libertadCir, '..'))%>%
+   dplyr::rename("vozMuj"='...11')%>%
+ mutate(vozMuj=na_if(vozMuj, '..'))%>%
+  dplyr::rename("accesoJus"='...15')%>%
+ mutate(accesoJus=na_if(accesoJus, '..'))
+```
+
+```{r}
+data_sin_na <- na.omit(dat2)
+```
+
+#### Unir datas
+
+```{r}
+dat=merge(dat1,data_sin_na, by = "Country")
+dat
+```
+
+```{r}
+data <- na.omit(dat)
+```
+
+```{r}
+names(data)
+```
+```{r}
+data=data[,-c(8)]
+names(data)
+```
+
+```{r}
+#install.packages("writexl")
+library(writexl)
+```
+
+```{r}
+write_xlsx(data, "datafinal.xlsx")
+```
+
++ Para analizar la desigualdad de género a nivel global hemos planteado una serie de
+variables independientes que nos permitirán crear tres indicadores:
+
+1. Participación en sociedad: Participación política (numérica continua) + Participación laboral
+(numérica continua) 
+2. Posibilidades: mujeres con secundaria completa (numérica contínua) +
+Inclusión financiera por género (numérica continua).
+3. Seguridad: Violencia hacia la mujer (numérica continua) + Acceso a la Justicia (numérica continua) + libertad de circulación (numérica continua)
